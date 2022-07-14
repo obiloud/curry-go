@@ -5,6 +5,7 @@ import (
 
 	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
+	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
 )
 
@@ -100,4 +101,22 @@ func Bind[A, B, C any](fn func(B) Either[A, C], e Either[A, B]) Either[A, C] {
 		return e
 	}
 	return fn(e.(right[B]).obj)
+}
+
+func ToMaybe[A, B any](e Either[A, B]) maybe.Maybe[B] {
+	if e.IsRight() {
+		return maybe.Just(e.(right[B]).obj)
+	}
+
+	return maybe.Nothing[B]()
+}
+
+func FromMaybe[A, B any](left A, m maybe.Maybe[B]) Either[A, B] {
+	if m.IsJust() {
+		obj, err := m.Unwrap()
+		if err == nil {
+			return FromRight[A](obj)
+		}
+	}
+	return FromLeft[A, B](left)
 }

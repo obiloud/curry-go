@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+
+	"github.com/obiloud/curry-go/maybe"
 )
 
 func TestMap(t *testing.T) {
@@ -68,5 +70,25 @@ func TestBind(t *testing.T) {
 	}
 	if FromLeft[string, int]("number is odd") != Bind(isEven, toInt("41")) {
 		t.Error("bind second")
+	}
+}
+
+// natural transformation
+
+func TestToMaybe(t *testing.T) {
+	if ToMaybe(FromRight[string]("Foo")) != maybe.Just("Foo") {
+		t.Errorf("right to maybe")
+	}
+	if ToMaybe(FromLeft[string, string]("Bar")) != maybe.Nothing[string]() {
+		t.Errorf("left to maybe")
+	}
+}
+
+func TestFromMaybe(t *testing.T) {
+	if FromMaybe("Could not transform", maybe.Just("Foo")) != FromRight[string]("Foo") {
+		t.Errorf("from just")
+	}
+	if FromMaybe("Could not transform", maybe.Nothing[string]()) != FromLeft[string, string]("Could not transform") {
+		t.Errorf("from nothing")
 	}
 }
