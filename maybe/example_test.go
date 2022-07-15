@@ -1,4 +1,4 @@
-package main
+package maybe_test
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/obiloud/curry-go/nub"
 )
 
-func main() {
+func Example_main() {
 
 	// holds no value
 	notInt := maybe.Nothing[int]()
