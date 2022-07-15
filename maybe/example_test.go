@@ -64,12 +64,12 @@ func Example_main() {
 
 	log.Printf("Functor Composition %s == %s", maybe.Map(nub.Compose(stringify, increment), justOne), maybe.Map(stringify, maybe.Map(increment, justOne)))
 
-	// Maybe is Aplicative
+	// Maybe is Appicative
 
 	log.Printf("Applicative identity %s == %s", maybe.Apply(maybe.Just(nub.Id[int]), justOne), justOne)
 
 	log.Printf(
-		"Apllicative Composition %s == %s",
+		"Applicative Composition %s == %s",
 		maybe.Apply(
 			maybe.Just(stringify),
 			maybe.Apply(
