@@ -11,7 +11,6 @@ import (
 type Maybe[T any] interface {
 	IsJust() bool
 	IsNothing() bool
-	Unwrap() (T, error)
 	String() string
 }
 
@@ -78,8 +77,8 @@ func Map[A, B any](fn func(A) B, maybe Maybe[A]) Maybe[B] {
 
 func Map2[A, B, C any](fn func(A, B) C, m1 Maybe[A], m2 Maybe[B]) Maybe[C] {
 	if m1.IsJust() && m2.IsJust() {
-		x, _ := m1.Unwrap()
-		y, _ := m2.Unwrap()
+		x := m1.(just[A]).obj
+		y := m2.(just[B]).obj
 
 		return Just(fn(x, y))
 	}

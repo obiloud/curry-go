@@ -14,13 +14,16 @@ func Example_main() {
 	notInt := maybe.Nothing[int]()
 
 	if notInt.IsJust() {
-		log.Print("It's an int")
+		log.Print("Holds a value")
 	} else {
-		log.Print("In't nothing really")
+		log.Print("Holds no value")
 	}
 
 	// holds the value of 1
 	justOne := maybe.Just(1)
+
+	log.Printf("access value on nothing: %d", maybe.WithDefault(0, notInt))
+	log.Printf("access value on just: %d", maybe.WithDefault(0, justOne))
 
 	// increment by 1 function
 	increment := func(x int) int { return x + 1 }
@@ -39,7 +42,7 @@ func Example_main() {
 	log.Printf("(Just 1) + (Just 2) = %s", justThree)
 
 	// function that produces a value if the input is even
-	iseven := func(x int) maybe.Maybe[int] {
+	isEven := func(x int) maybe.Maybe[int] {
 		if x%2 == 0 {
 			return maybe.Just(x)
 		}
@@ -47,12 +50,12 @@ func Example_main() {
 		return maybe.Nothing[int]()
 	}
 
-	// chains computations that produces a maybe
-	isEven := maybe.Bind(iseven, justThree)
+	// chains computations that may produce value or nothing
+	maybeEven := maybe.Bind(isEven, justThree)
 
-	log.Printf("even(Just 3) = %s", isEven)
+	log.Printf("isEven(Just 3) = %s", maybeEven)
 
-	// Maybe is a Functor
+	// Maybe is Functor
 
 	log.Printf("Functor Identity %s == %s", maybe.Map(nub.Id[int], justOne), nub.Id(justOne))
 
@@ -61,7 +64,7 @@ func Example_main() {
 
 	log.Printf("Functor Composition %s == %s", maybe.Map(nub.Compose(stringify, increment), justOne), maybe.Map(stringify, maybe.Map(increment, justOne)))
 
-	// Aplicative
+	// Maybe is Aplicative
 
 	log.Printf("Applicative identity %s == %s", maybe.Apply(maybe.Just(nub.Id[int]), justOne), justOne)
 
@@ -69,14 +72,15 @@ func Example_main() {
 		"Apllicative Composition %s == %s",
 		maybe.Apply(
 			maybe.Just(stringify),
-			maybe.Apply(maybe.Just(increment), justOne),
+			maybe.Apply(
+				maybe.Just(increment),
+				justOne,
+			),
 		),
 		maybe.Apply(
 			maybe.Apply(
 				maybe.Apply(
-					maybe.Just[func(func(int) string) func(func(int) int) func(int) string](
-						nub.Curry(nub.Compose[int, int, string]),
-					),
+					maybe.Just(nub.Curry(nub.Compose[int, int, string])),
 					maybe.Just(stringify),
 				),
 				maybe.Just(increment),

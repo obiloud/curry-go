@@ -20,11 +20,7 @@ type Ord interface {
 // curry
 //----------------------------------------------------------------
 
-type Uncurried[A any, B any, C any] func(A, B) C
-
-type Curried[A any, B any, C any] func(A) func(B) C
-
-func Curry[A any, B any, C any](fn Uncurried[A, B, C]) Curried[A, B, C] {
+func Curry[A any, B any, C any](fn func(A, B) C) func(A) func(B) C {
 	return func(x A) func(B) C {
 		return func(y B) C {
 			return fn(x, y)

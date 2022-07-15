@@ -233,12 +233,9 @@ func Filter[T any](fn func(T) bool, ls List[T]) List[T] {
 
 func FilterMap[A, B any](fn func(A) maybe.Maybe[B], ls List[A]) List[B] {
 	maybeCons := func(x A, xs List[B]) List[B] {
-		res := fn(x)
-		if res.IsJust() {
-			v, _ := res.Unwrap()
+		return maybe.WithDefault(xs, maybe.Map(func(v B) List[B] {
 			return Cons(v, xs)
-		}
-		return xs
+		}, fn(x)))
 	}
 	return FoldR(maybeCons, Nil[B](), ls)
 }

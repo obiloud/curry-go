@@ -225,13 +225,12 @@ func upAndOver[T any](z Zipper[T]) maybe.Maybe[Zipper[T]] {
 		return up
 	}
 
-	z1, _ := up.Unwrap()
-	right := GoRight(z1)
+	right := maybe.Bind(GoRight[T], up)
 	if right.IsJust() {
 		return right
 	}
 
-	return upAndOver(z1)
+	return maybe.Bind(upAndOver[T], up)
 }
 
 // Move to the root of the current Zipper focus. This allows navigation from

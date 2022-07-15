@@ -112,11 +112,10 @@ func ToMaybe[A, B any](e Either[A, B]) maybe.Maybe[B] {
 }
 
 func FromMaybe[A, B any](left A, m maybe.Maybe[B]) Either[A, B] {
-	if m.IsJust() {
-		obj, err := m.Unwrap()
-		if err == nil {
-			return FromRight[A](obj)
-		}
-	}
-	return FromLeft[A, B](left)
+	return maybe.WithDefault(
+		FromLeft[A, B](left),
+		maybe.Map(func(x B) Either[A, B] {
+			return FromRight[B](x)
+		}, m),
+	)
 }
