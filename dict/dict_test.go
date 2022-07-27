@@ -121,7 +121,25 @@ func TestMerge(t *testing.T) {
 	}
 
 	s1 := Insert("u1", list.Singleton(1), Empty[string, list.List[int]]())
+
 	s2 := Insert("u2", list.Singleton(2), Empty[string, list.List[int]]())
+
+	s23 := Insert("u2", list.Singleton(3), Empty[string, list.List[int]]())
+
+	b1 := FromList(list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
+		return tuple.Pair(x, list.Singleton(x))
+	}, list.Range(1, 10)))
+
+	b2 := FromList(list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
+		return tuple.Pair(x, list.Singleton(x))
+	}, list.Range(5, 15)))
+
+	bExpected := list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
+		if x > 4 && x < 11 {
+			return tuple.Pair(x, list.Cons(x, list.Singleton(x)))
+		}
+		return tuple.Pair(x, list.Singleton(x))
+	}, list.Range(1, 15))
 
 	if ToList(Merge(
 		Insert[string, list.List[int]],
@@ -132,5 +150,38 @@ func TestMerge(t *testing.T) {
 		Empty[string, list.List[int]](),
 	)) != list.FromSlice([]tuple.Tuple[string, list.List[int]]{tuple.Pair("u1", list.Singleton(1)), tuple.Pair("u2", list.Singleton(2))}) {
 		t.Error("Merge singletons in order")
+	}
+
+	if ToList(Merge(
+		Insert[string, list.List[int]],
+		insertBoth[string],
+		Insert[string, list.List[int]],
+		s2,
+		s1,
+		Empty[string, list.List[int]](),
+	)) != list.FromSlice([]tuple.Tuple[string, list.List[int]]{tuple.Pair("u1", list.Singleton(1)), tuple.Pair("u2", list.Singleton(2))}) {
+		t.Error("Merge singletons out of order")
+	}
+
+	if ToList(Merge(
+		Insert[string, list.List[int]],
+		insertBoth[string],
+		Insert[string, list.List[int]],
+		s2,
+		s23,
+		Empty[string, list.List[int]](),
+	)) != list.Singleton(tuple.Pair("u2", list.FromSlice([]int{2, 3}))) {
+		t.Error("Merge with duplicate key")
+	}
+
+	if ToList(Merge(
+		Insert[int, list.List[int]],
+		insertBoth[int],
+		Insert[int, list.List[int]],
+		b1,
+		b2,
+		Empty[int, list.List[int]](),
+	)) != bExpected {
+		t.Error("Partially overlapping")
 	}
 }
