@@ -7,16 +7,51 @@ import (
 	"github.com/obiloud/curry-go/tuple"
 )
 
+// A dictionary mapping unique keys to values. The keys can be any comparable type.
 type Dict[A nub.Ord, B any] struct {
 	dict list.List[tuple.Tuple[A, B]]
 }
 
+// Convert a dictionary into a string.
 func (dict Dict[A, B]) String() string {
 	return dict.dict.String()
 }
 
+// Convert an association list into a dictionary.
 func FromList[A nub.Ord, B any](ls list.List[tuple.Tuple[A, B]]) Dict[A, B] {
 	return Dict[A, B]{dict: list.SortBy(tuple.First[A, B], ls)}
+}
+
+// Convert a dictionary into an association list of key-value pairs, sorted by keys.
+func ToList[A nub.Ord, B any](dict Dict[A, B]) list.List[tuple.Tuple[A, B]] {
+	return dict.dict
+}
+
+// Get all of the keys in a dictionary, sorted from lowest to highest.
+func Keys[A nub.Ord, B any](dict Dict[A, B]) list.List[A] {
+	return list.Map(tuple.First[A, B], dict.dict)
+}
+
+// Get all of the values in a dictionary, in the order of their keys.
+func Values[A nub.Ord, B any](dict Dict[A, B]) list.List[B] {
+	return list.Map(tuple.Second[A, B], dict.dict)
+}
+
+// Convert a golang map into a dictionary.
+func FromGoMap[A nub.Ord, B any](gomap map[A]B) Dict[A, B] {
+	dict := Empty[A, B]()
+	for k, v := range gomap {
+		dict = Insert(k, v, dict)
+	}
+	return dict
+}
+
+// Convert a dictionary into a golang map.
+func ToGoMap[A nub.Ord, B any](dict Dict[A, B]) map[A]B {
+	return FoldL(func(key A, value B, acc map[A]B) map[A]B {
+		acc[key] = value
+		return acc
+	}, map[A]B{}, dict)
 }
 
 func Empty[A nub.Ord, B any]() Dict[A, B] {
@@ -29,18 +64,6 @@ func IsEmpty[A nub.Ord, B any](dict Dict[A, B]) bool {
 
 func Singleton[A nub.Ord, B any](key A, value B) Dict[A, B] {
 	return Dict[A, B]{dict: list.Singleton(tuple.Pair(key, value))}
-}
-
-func Keys[A nub.Ord, B any](dict Dict[A, B]) list.List[A] {
-	return list.Map(tuple.First[A, B], dict.dict)
-}
-
-func Values[A nub.Ord, B any](dict Dict[A, B]) list.List[B] {
-	return list.Map(tuple.Second[A, B], dict.dict)
-}
-
-func ToList[A nub.Ord, B any](dict Dict[A, B]) list.List[tuple.Tuple[A, B]] {
-	return dict.dict
 }
 
 func Get[A nub.Ord, B any](key A, dict Dict[A, B]) maybe.Maybe[B] {
@@ -154,6 +177,12 @@ func Merge[A nub.Ord, B, C, D any](insertLeft func(A, B, D) D, insertBoth func(A
 	return list.FoldL(func(pair tuple.Tuple[A, B], acc D) D {
 		return insertLeft(tuple.First(pair), tuple.Second(pair), acc)
 	}, tuple.Second(intermediate), tuple.First(intermediate))
+}
+
+func Map[A nub.Ord, B, C any](fn func(B) C, dict Dict[A, B]) Dict[A, C] {
+	return Dict[A, C]{dict: list.Map(func(pair tuple.Tuple[A, B]) tuple.Tuple[A, C] {
+		return tuple.MapSecond(fn, pair)
+	}, dict.dict)}
 }
 
 func FoldL[A nub.Ord, B any, C any](fn func(A, B, C) C, acc C, dict Dict[A, B]) C {

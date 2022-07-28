@@ -3,6 +3,7 @@ package dict
 import (
 	"testing"
 
+	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
@@ -44,6 +45,14 @@ func TestBuild(t *testing.T) {
 
 	if Singleton("k", "v") != Remove("foo", Singleton("k", "v")) {
 		t.Error("Remove not found")
+	}
+
+	if FromGoMap(map[string]string{"k": "v"}) != Singleton("k", "v") {
+		t.Error("From Go Map")
+	}
+
+	if debug.Stringify(ToGoMap(Singleton("k", "v"))) != debug.Stringify(map[string]string{"k": "v"}) {
+		t.Error("To Go Map")
 	}
 }
 
@@ -94,6 +103,11 @@ func TestCombine(t *testing.T) {
 }
 
 func TestTransform(t *testing.T) {
+	if Map(func(x int) int { return x + 1 }, FromList(list.Cons(tuple.Pair("a", 1), list.Singleton(tuple.Pair("b", 2))))) !=
+		FromList(list.Cons(tuple.Pair("a", 2), list.Singleton(tuple.Pair("b", 3)))) {
+		t.Error("Map")
+	}
+
 	if Filter(func(k string, _ string) bool { return k == "Tom" }, animals) != Singleton("Tom", "cat") {
 		t.Error("Filter")
 	}
