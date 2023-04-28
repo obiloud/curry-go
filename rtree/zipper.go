@@ -3,10 +3,10 @@ package rtree
 import (
 	"fmt"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
+	"github.com/obiloud/curry-go/util"
 )
 
 // The necessary information needed to reconstruct a MultiwayTree as it is
@@ -21,7 +21,7 @@ type Context[T any] struct {
 }
 
 func (c Context[T]) String() string {
-	return fmt.Sprintf("Context %s (%s) (%s)", debug.Stringify(c.Previous), c.Before.String(), c.After.String())
+	return fmt.Sprintf("Context %s (%s) (%s)", util.Stringify(c.Previous), c.Before.String(), c.After.String())
 }
 
 // A list of Contexts that is contructed as a MultiwayTree is navigated.

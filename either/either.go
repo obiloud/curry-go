@@ -3,10 +3,10 @@ package either
 import (
 	"fmt"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
+	"github.com/obiloud/curry-go/util"
 )
 
 type Either[A, B any] interface {
@@ -28,7 +28,7 @@ func (l left[A]) IsRight() bool {
 }
 
 func (l left[A]) String() string {
-	return fmt.Sprintf("Left(%s)", debug.Stringify(l.err))
+	return fmt.Sprintf("Left(%s)", util.Stringify(l.err))
 }
 
 type right[B any] struct {
@@ -44,7 +44,7 @@ func (r right[B]) IsRight() bool {
 }
 
 func (r right[B]) String() string {
-	return fmt.Sprintf("Right(%s)", debug.Stringify(r.obj))
+	return fmt.Sprintf("Right(%s)", util.Stringify(r.obj))
 }
 
 func FromLeft[A, B any](err A) Either[A, B] {

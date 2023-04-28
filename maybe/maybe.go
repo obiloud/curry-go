@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/nub"
+	"github.com/obiloud/curry-go/util"
 )
 
 type Maybe[T any] interface {
@@ -33,7 +33,7 @@ func (j just[T]) Unwrap() (T, error) {
 }
 
 func (j just[T]) String() string {
-	return fmt.Sprintf("Just (%s)", debug.Stringify(j.obj))
+	return fmt.Sprintf("Just (%s)", util.Stringify(j.obj))
 }
 
 func (n nothing[T]) IsJust() bool {

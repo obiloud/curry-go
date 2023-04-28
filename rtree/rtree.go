@@ -3,11 +3,11 @@ package rtree
 import (
 	"fmt"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
 	"github.com/obiloud/curry-go/tuple"
+	"github.com/obiloud/curry-go/util"
 )
 
 type RTree[T any] struct {
@@ -16,7 +16,7 @@ type RTree[T any] struct {
 }
 
 func (t RTree[T]) String() string {
-	return fmt.Sprintf("Tree %s %s", debug.Stringify(t.Data), t.Children.String())
+	return fmt.Sprintf("Tree %s %s", util.Stringify(t.Data), t.Children.String())
 }
 
 func InsertChild[T any](child RTree[T], tree RTree[T]) RTree[T] {
