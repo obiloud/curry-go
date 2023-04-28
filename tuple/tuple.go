@@ -3,7 +3,7 @@ package tuple
 import (
 	"fmt"
 
-	"github.com/obiloud/curry-go/debug"
+	"github.com/obiloud/curry-go/util"
 )
 
 type Tuple[A, B any] struct {
@@ -19,7 +19,7 @@ func Pair[A, B any](first A, second B) Tuple[A, B] {
 }
 
 func (pair Tuple[A, B]) String() string {
-	return fmt.Sprintf("(%s, %s)", debug.Stringify(pair.first), debug.Stringify(pair.second))
+	return fmt.Sprintf("(%s, %s)", util.Stringify(pair.first), util.Stringify(pair.second))
 }
 
 func First[A, B any](tuple Tuple[A, B]) A {

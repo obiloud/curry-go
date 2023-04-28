@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
 	"github.com/obiloud/curry-go/tuple"
+	"github.com/obiloud/curry-go/util"
 )
 
 type List[T any] interface {
@@ -36,7 +36,7 @@ func (c consList[T]) isCons() bool {
 
 func (c consList[T]) String() string {
 	toString := func(x T) string {
-		return debug.Stringify(x)
+		return util.Stringify(x)
 	}
 	strs := Map[T](toString, c)
 	slice := ToSlice(strs)
