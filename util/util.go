@@ -10,6 +10,9 @@ type Writer interface {
 }
 
 func Stringify(x interface{}) string {
+	if err, ok := x.(error); ok {
+		return fmt.Sprintf("error: %s;", err.Error())
+	}
 	if writer, ok := x.(Writer); ok {
 		return writer.String()
 	}
