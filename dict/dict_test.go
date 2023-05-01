@@ -3,11 +3,11 @@ package dict
 import (
 	"testing"
 
-	"github.com/obiloud/curry-go/debug"
 	"github.com/obiloud/curry-go/list"
 	"github.com/obiloud/curry-go/maybe"
 	"github.com/obiloud/curry-go/nub"
 	"github.com/obiloud/curry-go/tuple"
+	"github.com/obiloud/curry-go/util"
 )
 
 func TestBuild(t *testing.T) {
@@ -51,7 +51,7 @@ func TestBuild(t *testing.T) {
 		t.Error("From Go Map")
 	}
 
-	if debug.Stringify(ToGoMap(Singleton("k", "v"))) != debug.Stringify(map[string]string{"k": "v"}) {
+	if util.Stringify(ToGoMap(Singleton("k", "v"))) != util.Stringify(map[string]string{"k": "v"}) {
 		t.Error("To Go Map")
 	}
 }
