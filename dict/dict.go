@@ -101,9 +101,10 @@ func Diff[A nub.Ord, B any](a Dict[A, B], b Dict[A, B]) Dict[A, B] {
 
 // The most general way of combining two dictionaries. You provide three
 // accumulators for when a given key appears:
-//   1. Only in the left dictionary.
-//   2. In both dictionaries.
-//   3. Only in the right dictionary.
+//  1. Only in the left dictionary.
+//  2. In both dictionaries.
+//  3. Only in the right dictionary.
+//
 // You then traverse all the keys from lowest to highest, building up whatever
 // you want.
 func Merge[A nub.Ord, B, C, D any](insertLeft func(A, B, D) D, insertBoth func(A, B, C, D) D, insertRight func(A, C, D) D, left Dict[A, B], right Dict[A, C], result D) D {
@@ -134,7 +135,7 @@ func Merge[A nub.Ord, B, C, D any](insertLeft func(A, B, D) D, insertBoth func(A
 
 				return tuple.Pair(tail, insertBoth(lKey, lValue, rVal, tuple.Second(acc)))
 
-			}, list.Head(xs), list.Tail(xs)))
+			}, list.Head(xs), maybe.Just(list.Tail(xs))))
 	}
 
 	intermediate := FoldL(step, tuple.Pair(left.dict, result), right)

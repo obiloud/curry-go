@@ -356,11 +356,11 @@ func Head[T any](list List[T]) maybe.Maybe[T] {
 	return maybe.Nothing[T]()
 }
 
-func Tail[T any](list List[T]) maybe.Maybe[List[T]] {
+func Tail[T any](list List[T]) List[T] {
 	if list.isCons() {
-		return maybe.Just(list.(consList[T]).tail)
+		return list.(consList[T]).tail
 	}
-	return maybe.Nothing[List[T]]()
+	return list
 }
 
 func Take[T any](n int, ls List[T]) List[T] {
