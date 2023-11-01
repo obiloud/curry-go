@@ -93,7 +93,7 @@ func GoUp[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 				Data:     context.Previous,
 				Children: list.Append(context.Before, list.Cons(zipper.Tree, context.After)),
 			},
-			Breadcrumbs: maybe.WithDefault(list.Nil[Context[T]](), list.Tail(zipper.Breadcrumbs)),
+			Breadcrumbs: list.Tail(zipper.Breadcrumbs),
 		}
 	}
 	return maybe.Map(zip, list.Head(zipper.Breadcrumbs))
@@ -147,11 +147,11 @@ func GoLeft[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 						Before:   list.Reverse(rest),
 						After:    list.Cons(zipper.Tree, context.After),
 					},
-					maybe.WithDefault(list.Nil[Context[T]](), list.Tail(zipper.Breadcrumbs)),
+					list.Tail(zipper.Breadcrumbs),
 				),
 			}
 		}
-		return maybe.Map2(newCtx, list.Head(reversed), list.Tail(reversed))
+		return maybe.Map2(newCtx, list.Head(reversed), maybe.Just(list.Tail(reversed)))
 	}
 	return maybe.Bind(zip, list.Head(zipper.Breadcrumbs))
 }
@@ -178,11 +178,11 @@ func GoRight[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 						Before:   list.Append(context.Before, list.Singleton(zipper.Tree)),
 						After:    rest,
 					},
-					maybe.WithDefault(list.Nil[Context[T]](), list.Tail(zipper.Breadcrumbs)),
+					list.Tail(zipper.Breadcrumbs),
 				),
 			}
 		}
-		return maybe.Map2(newCtx, list.Head(context.After), list.Tail(context.After))
+		return maybe.Map2(newCtx, list.Head(context.After), maybe.Just(list.Tail(context.After)))
 	}
 	return maybe.Bind(zip, list.Head(zipper.Breadcrumbs))
 }

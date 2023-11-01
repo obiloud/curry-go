@@ -110,7 +110,7 @@ func MapListOverTree[A, B, C any](fn func(A, B) C, ls list.List[A], tree RTree[B
 		}
 	}
 
-	return maybe.Map2(transform, list.Head(ls), list.Tail(ls))
+	return maybe.Map2(transform, list.Head(ls), maybe.Just(list.Tail(ls)))
 }
 
 func splitByLength[T any](listOfLengths list.List[int], ls list.List[T]) list.List[list.List[T]] {
@@ -130,7 +130,7 @@ func splitByLengthHelper[T any](listOfLengths list.List[int], ls list.List[T], a
 			}
 			return splitByLengthHelper(restLengths, list.Drop(currentLength, ls), list.Cons(list.Take(currentLength, ls), acc))
 
-		}, list.Head(listOfLengths), list.Tail(listOfLengths)))
+		}, list.Head(listOfLengths), maybe.Just(list.Tail(listOfLengths))))
 }
 
 func IndexedMap[A, B any](fn func(int, A) B, tree RTree[A]) maybe.Maybe[RTree[B]] {
