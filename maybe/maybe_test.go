@@ -48,15 +48,15 @@ func TestApply(t *testing.T) {
 		return x + 1
 	}
 
-	if Apply(Just(add1), Just(0)) != Just(1) {
+	if Apply[int, int](Just(add1), Just(0)) != Just(1) {
 		t.Error("on (Just, Just)")
 	}
 
-	if Apply(Just(add1), Nothing[int]()) != Nothing[int]() {
+	if Apply[int, int](Just(add1), Nothing[int]()) != Nothing[int]() {
 		t.Error("on (Just, Nothing)")
 	}
 
-	if Apply(Nothing[func(int) int](), Just(0)) != Nothing[int]() {
+	if Apply[int, int](Nothing[func(int) int](), Just(0)) != Nothing[int]() {
 		t.Error("on (Nothing, Just)")
 	}
 }
