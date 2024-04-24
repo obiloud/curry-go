@@ -12,11 +12,11 @@ func TestMap(t *testing.T) {
 	add1 := func(x int) int {
 		return x + 1
 	}
-	if FromRight[string](3) != Map(add1, FromRight[string](2)) {
+	if FromRight[string, int](3) != Map[string, int](add1, FromRight[string, int](2)) {
 		t.Error("map OK")
 	}
 
-	if FromLeft[string, int]("error") != Map(add1, FromLeft[string, int]("error")) {
+	if FromLeft[string, int]("error") != Map[string, int](add1, FromLeft[string, int]("error")) {
 		t.Error("map Err")
 	}
 }
@@ -25,10 +25,10 @@ func TestMap2(t *testing.T) {
 	sum := func(x, y int) int {
 		return x + y
 	}
-	if FromRight[string](3) != Map2(sum, FromRight[string](1), FromRight[string](2)) {
+	if FromRight[string, int](3) != Map2[string, int](sum, FromRight[string, int](1), FromRight[string, int](2)) {
 		t.Error("map2 OK")
 	}
-	if FromLeft[string, int]("x") != Map2(sum, FromRight[string](1), FromLeft[string, int]("x")) {
+	if FromLeft[string, int]("x") != Map2[string, int](sum, FromRight[string, int](1), FromLeft[string, int]("x")) {
 		t.Error("map2 Err")
 	}
 }
@@ -37,10 +37,10 @@ func TestApply(t *testing.T) {
 	add1 := func(x int) int {
 		return x + 1
 	}
-	if FromRight[string](3) != Apply(FromRight[string](add1), FromRight[string](2)) {
+	if FromRight[string, int](3) != Apply[string, int, int](FromRight[string, func(int) int](add1), FromRight[string, int](2)) {
 		t.Error("apply OK")
 	}
-	if FromLeft[string, int]("x") != Apply(FromRight[string](add1), FromLeft[string, int]("x")) {
+	if FromLeft[string, int]("x") != Apply[string, int, int](FromRight[string, func(int) int](add1), FromLeft[string, int]("x")) {
 		t.Error("apply Err")
 	}
 }
@@ -76,19 +76,19 @@ func TestBind(t *testing.T) {
 // natural transformation
 
 func TestToMaybe(t *testing.T) {
-	if ToMaybe(FromRight[string]("Foo")) != maybe.Just("Foo") {
+	if ToMaybe[string, string](FromRight[string]("Foo")) != maybe.Just("Foo") {
 		t.Errorf("right to maybe")
 	}
-	if ToMaybe(FromLeft[string, string]("Bar")) != maybe.Nothing[string]() {
+	if ToMaybe[string, string](FromLeft[string, string]("Bar")) != maybe.Nothing[string]() {
 		t.Errorf("left to maybe")
 	}
 }
 
 func TestFromMaybe(t *testing.T) {
-	if FromMaybe("Could not transform", maybe.Just("Foo")) != FromRight[string]("Foo") {
+	if FromMaybe[string, string]("Could not transform", maybe.Just("Foo")) != FromRight[string]("Foo") {
 		t.Errorf("from just")
 	}
-	if FromMaybe("Could not transform", maybe.Nothing[string]()) != FromLeft[string, string]("Could not transform") {
+	if FromMaybe[string, string]("Could not transform", maybe.Nothing[string]()) != FromLeft[string, string]("Could not transform") {
 		t.Errorf("from nothing")
 	}
 }

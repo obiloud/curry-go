@@ -93,7 +93,7 @@ func Map2[A, B, C, D any](fn func(B, C) D, e1 Either[A, B], e2 Either[A, C]) Eit
 }
 
 func Apply[A, B, C any](ea Either[A, func(B) C], eb Either[A, B]) Either[A, C] {
-	return Map2(nub.ApplyFlipped[B, C], eb, ea)
+	return Map2[A, B](nub.ApplyFlipped[B, C], eb, ea)
 }
 
 func Bind[A, B, C any](fn func(B) Either[A, C], e Either[A, B]) Either[A, C] {
