@@ -62,11 +62,11 @@ type split[T any] struct {
 }
 
 func splitOnIndex[T any](n int, xs list.List[RTree[T]]) maybe.Maybe[split[T]] {
-	before := list.Take(n, xs)
+	before := list.Take[RTree[T]](n, xs)
 
-	focus := list.Head(list.Drop(n, xs))
+	focus := list.Head[RTree[T]](list.Drop[RTree[T]](n, xs))
 
-	after := list.Drop(n+1, xs)
+	after := list.Drop[RTree[T]](n+1, xs)
 
 	toSplit := func(f RTree[T]) split[T] {
 		return split[T]{
@@ -83,7 +83,7 @@ func splitOnIndex[T any](n int, xs list.List[RTree[T]]) maybe.Maybe[split[T]] {
 // child to it's parent.
 
 func GoUp[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
-	if list.IsEmpty(zipper.Breadcrumbs) {
+	if list.IsEmpty[Context[T]](zipper.Breadcrumbs) {
 		return maybe.Nothing[Zipper[T]]()
 	}
 
@@ -91,12 +91,12 @@ func GoUp[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 		return Zipper[T]{
 			Tree: RTree[T]{
 				Data:     context.Previous,
-				Children: list.Append(context.Before, list.Cons(zipper.Tree, context.After)),
+				Children: list.Append[RTree[T]](context.Before, list.Cons(zipper.Tree, context.After)),
 			},
-			Breadcrumbs: list.Tail(zipper.Breadcrumbs),
+			Breadcrumbs: list.Tail[Context[T]](zipper.Breadcrumbs),
 		}
 	}
-	return maybe.Map(zip, list.Head(zipper.Breadcrumbs))
+	return maybe.Map(zip, list.Head[Context[T]](zipper.Breadcrumbs))
 }
 
 // Move down relative to the current Zipper focus. This allows navigation from
@@ -114,29 +114,29 @@ func GoToChild[T any](n int, zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 		}
 	}
 
-	return maybe.Map(changeCtx, splitOnIndex(n, zipper.Tree.Children))
+	return maybe.Map(changeCtx, splitOnIndex[T](n, zipper.Tree.Children))
 }
 
 // Move down and as far right as possible relative to the current Zipper focus.
 // This allows navigation from a parent to it's last child.
 
 func GoToRightMostChild[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
-	return GoToChild(list.Length(zipper.Tree.Children)-1, zipper)
+	return GoToChild(list.Length[RTree[T]](zipper.Tree.Children)-1, zipper)
 }
 
 // Move left relative to the current Zipper focus. This allows navigation from
 // a child to it's previous sibling.
 
 func GoLeft[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
-	if list.IsEmpty(zipper.Breadcrumbs) {
+	if list.IsEmpty[Context[T]](zipper.Breadcrumbs) {
 		return maybe.Nothing[Zipper[T]]()
 	}
 
 	zip := func(context Context[T]) maybe.Maybe[Zipper[T]] {
-		if list.IsEmpty(context.Before) {
+		if list.IsEmpty[RTree[T]](context.Before) {
 			return maybe.Nothing[Zipper[T]]()
 		}
-		reversed := list.Reverse(context.Before)
+		reversed := list.Reverse[RTree[T]](context.Before)
 
 		newCtx := func(t RTree[T], rest list.List[RTree[T]]) Zipper[T] {
 			return Zipper[T]{
@@ -144,28 +144,28 @@ func GoLeft[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 				Breadcrumbs: list.Cons(
 					Context[T]{
 						Previous: context.Previous,
-						Before:   list.Reverse(rest),
+						Before:   list.Reverse[RTree[T]](rest),
 						After:    list.Cons(zipper.Tree, context.After),
 					},
-					list.Tail(zipper.Breadcrumbs),
+					list.Tail[Context[T]](zipper.Breadcrumbs),
 				),
 			}
 		}
-		return maybe.Map2(newCtx, list.Head(reversed), maybe.Just(list.Tail(reversed)))
+		return maybe.Map2(newCtx, list.Head[RTree[T]](reversed), maybe.Just(list.Tail[RTree[T]](reversed)))
 	}
-	return maybe.Bind(zip, list.Head(zipper.Breadcrumbs))
+	return maybe.Bind(zip, list.Head[Context[T]](zipper.Breadcrumbs))
 }
 
 // Move right relative to the current Zipper focus. This allows navigation from
 // a child to it's next sibling.
 
 func GoRight[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
-	if list.IsEmpty(zipper.Breadcrumbs) {
+	if list.IsEmpty[Context[T]](zipper.Breadcrumbs) {
 		return maybe.Nothing[Zipper[T]]()
 	}
 
 	zip := func(context Context[T]) maybe.Maybe[Zipper[T]] {
-		if list.IsEmpty(context.After) {
+		if list.IsEmpty[RTree[T]](context.After) {
 			return maybe.Nothing[Zipper[T]]()
 		}
 
@@ -175,16 +175,16 @@ func GoRight[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
 				Breadcrumbs: list.Cons(
 					Context[T]{
 						Previous: context.Previous,
-						Before:   list.Append(context.Before, list.Singleton(zipper.Tree)),
+						Before:   list.Append[RTree[T]](context.Before, list.Singleton(zipper.Tree)),
 						After:    rest,
 					},
-					list.Tail(zipper.Breadcrumbs),
+					list.Tail[Context[T]](zipper.Breadcrumbs),
 				),
 			}
 		}
-		return maybe.Map2(newCtx, list.Head(context.After), maybe.Just(list.Tail(context.After)))
+		return maybe.Map2(newCtx, list.Head[RTree[T]](context.After), maybe.Just(list.Tail[RTree[T]](context.After)))
 	}
-	return maybe.Bind(zip, list.Head(zipper.Breadcrumbs))
+	return maybe.Bind(zip, list.Head[Context[T]](zipper.Breadcrumbs))
 }
 
 // Moves to the previous node in the hierarchy, depth-first.
@@ -237,7 +237,7 @@ func upAndOver[T any](z Zipper[T]) maybe.Maybe[Zipper[T]] {
 // any part of the tree back to the root.
 
 func GoToRoot[T any](zipper Zipper[T]) maybe.Maybe[Zipper[T]] {
-	if list.IsEmpty(zipper.Breadcrumbs) {
+	if list.IsEmpty[Context[T]](zipper.Breadcrumbs) {
 		return maybe.Just(zipper)
 	}
 	return maybe.Bind(GoToRoot[T], GoUp(zipper))

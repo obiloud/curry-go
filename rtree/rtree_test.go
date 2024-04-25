@@ -227,7 +227,7 @@ func TestFoldL(t *testing.T) {
 	cons := func(x string, xs list.List[string]) list.List[string] {
 		return list.Cons(x, xs)
 	}
-	if Flatten(interestingTree) != list.Reverse(FoldL(cons, list.Nil[string](), interestingTree)) {
+	if Flatten(interestingTree) != list.Reverse[string](FoldL(cons, list.Nil[string](), interestingTree)) {
 		t.Error("Foldl interestingTree into List")
 	}
 }
@@ -245,7 +245,7 @@ func TestLength(t *testing.T) {
 		t.Error("Length of a deepTree")
 	}
 
-	if Length(interestingTree) != list.Length(Flatten(interestingTree)) {
+	if Length(interestingTree) != list.Length[string](Flatten(interestingTree)) {
 		t.Error("Length of a Tree is equal to length of a flattened tree")
 	}
 }

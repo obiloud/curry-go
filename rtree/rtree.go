@@ -25,7 +25,7 @@ func InsertChild[T any](child RTree[T], tree RTree[T]) RTree[T] {
 }
 
 func AppendChild[T any](child RTree[T], tree RTree[T]) RTree[T] {
-	tree.Children = list.Append(tree.Children, list.Singleton(child))
+	tree.Children = list.Append[RTree[T]](tree.Children, list.Singleton(child))
 	return tree
 }
 
@@ -53,7 +53,7 @@ func Flatten[T any](tree RTree[T]) list.List[T] {
 }
 
 func TuplesOfDatumAndFlatChildren[T any](tree RTree[T]) list.List[tuple.Tuple[T, list.List[T]]] {
-	return list.Append(
+	return list.Append[tuple.Tuple[T, list.List[T]]](
 		list.Singleton(
 			tuple.Pair(tree.Data, list.ConcatMap(Flatten[T], tree.Children)),
 		),
@@ -79,10 +79,10 @@ func Map[A, B any](fn func(A) B, tree RTree[A]) RTree[B] {
 }
 
 func MapListOverTree[A, B, C any](fn func(A, B) C, ls list.List[A], tree RTree[B]) maybe.Maybe[RTree[C]] {
-	if list.IsEmpty(ls) {
+	if list.IsEmpty[A](ls) {
 		return maybe.Nothing[RTree[C]]()
 	}
-	if list.Length(ls) == 1 {
+	if list.Length[A](ls) == 1 {
 		mapData := func(head A) RTree[C] {
 			return RTree[C]{
 				Data:     fn(head, tree.Data),
@@ -90,7 +90,7 @@ func MapListOverTree[A, B, C any](fn func(A, B) C, ls list.List[A], tree RTree[B
 			}
 
 		}
-		return maybe.Map(mapData, list.Head(ls))
+		return maybe.Map(mapData, list.Head[A](ls))
 	}
 
 	transform := func(head A, tail list.List[A]) RTree[C] {
@@ -98,7 +98,7 @@ func MapListOverTree[A, B, C any](fn func(A, B) C, ls list.List[A], tree RTree[B
 
 		lengths := list.Map(Length[B], tree.Children)
 
-		listGroupedByLengthOfChildren := splitByLength(lengths, tail)
+		listGroupedByLengthOfChildren := splitByLength[A](lengths, tail)
 
 		mappedChildren := list.Map2(func(l list.List[A], child RTree[B]) maybe.Maybe[RTree[C]] {
 			return MapListOverTree(fn, l, child)
@@ -110,27 +110,27 @@ func MapListOverTree[A, B, C any](fn func(A, B) C, ls list.List[A], tree RTree[B
 		}
 	}
 
-	return maybe.Map2(transform, list.Head(ls), maybe.Just(list.Tail(ls)))
+	return maybe.Map2(transform, list.Head[A](ls), maybe.Just(list.Tail[A](ls)))
 }
 
 func splitByLength[T any](listOfLengths list.List[int], ls list.List[T]) list.List[list.List[T]] {
-	return splitByLengthHelper(listOfLengths, ls, list.Nil[list.List[T]]())
+	return splitByLengthHelper[T](listOfLengths, ls, list.Nil[list.List[T]]())
 }
 
 func splitByLengthHelper[T any](listOfLengths list.List[int], ls list.List[T], acc list.List[list.List[T]]) list.List[list.List[T]] {
-	if list.IsEmpty(listOfLengths) {
-		return list.Reverse(acc)
+	if list.IsEmpty[int](listOfLengths) {
+		return list.Reverse[list.List[T]](acc)
 	}
 
 	return maybe.WithDefault(
-		list.Reverse(acc),
+		list.Reverse[list.List[T]](acc),
 		maybe.Map2(func(currentLength int, restLengths list.List[int]) list.List[list.List[T]] {
-			if list.IsEmpty(ls) {
-				return list.Reverse(acc)
+			if list.IsEmpty[T](ls) {
+				return list.Reverse[list.List[T]](acc)
 			}
-			return splitByLengthHelper(restLengths, list.Drop(currentLength, ls), list.Cons(list.Take(currentLength, ls), acc))
+			return splitByLengthHelper[T](restLengths, list.Drop[T](currentLength, ls), list.Cons(list.Take[T](currentLength, ls), acc))
 
-		}, list.Head(listOfLengths), maybe.Just(list.Tail(listOfLengths))))
+		}, list.Head[int](listOfLengths), maybe.Just(list.Tail[int](listOfLengths))))
 }
 
 func IndexedMap[A, B any](fn func(int, A) B, tree RTree[A]) maybe.Maybe[RTree[B]] {
@@ -150,7 +150,7 @@ func Filter[T any](predicate func(T) bool, tree RTree[T]) maybe.Maybe[RTree[T]] 
 
 func FilterWithChildPresedence[T any](predicate func(T) bool, tree RTree[T]) maybe.Maybe[RTree[T]] {
 	fChildren := list.FilterMap(nub.Curry(FilterWithChildPresedence[T])(predicate), tree.Children)
-	if list.IsEmpty(fChildren) {
+	if list.IsEmpty[RTree[T]](fChildren) {
 		if predicate(tree.Data) {
 			return maybe.Just(RTree[T]{
 				Data:     tree.Data,
