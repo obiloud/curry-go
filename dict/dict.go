@@ -24,7 +24,7 @@ func Empty[A nub.Ord, B any]() Dict[A, B] {
 
 // Determine if a dictionary is empty.
 func IsEmpty[A nub.Ord, B any](dict Dict[A, B]) bool {
-	return list.IsEmpty(dict.dict)
+	return list.IsEmpty[A](dict.dict)
 }
 
 // Create a dictionary with one key-value pair.
@@ -37,7 +37,7 @@ func Singleton[A nub.Ord, B any](key A, value B) Dict[A, B] {
 // dictionary.
 func Get[A nub.Ord, B any](key A, dict Dict[A, B]) maybe.Maybe[B] {
 	return maybe.Map(tuple.Second[A, B],
-		list.Head(list.Filter(func(pair tuple.Tuple[A, B]) bool {
+		list.Head[tuple.Tuple[A, B]](list.Filter(func(pair tuple.Tuple[A, B]) bool {
 			return tuple.First(pair) == key
 		}, dict.dict)),
 	)
@@ -50,7 +50,7 @@ func Member[A nub.Ord, B any](key A, dict Dict[A, B]) bool {
 
 // Determine the number of key-value pairs in the dictionary.
 func Size[A nub.Ord, B any](dict Dict[A, B]) int {
-	return list.Length(dict.dict)
+	return list.Length[tuple.Tuple[A, B]](dict.dict)
 }
 
 // Insert a key-value pair into a dictionary. Replaces value when there is a collision.
@@ -113,7 +113,7 @@ func Merge[A nub.Ord, B, C, D any](insertLeft func(A, B, D) D, insertBoth func(A
 	step = func(rKey A, rVal C, acc tuple.Tuple[list.List[tuple.Tuple[A, B]], D]) tuple.Tuple[list.List[tuple.Tuple[A, B]], D] {
 		xs := tuple.First(acc)
 
-		if list.IsEmpty(xs) {
+		if list.IsEmpty[tuple.Tuple[A, B]](xs) {
 			return tuple.MapSecond(func(r D) D {
 				return insertRight(rKey, rVal, r)
 			}, acc)
@@ -135,7 +135,7 @@ func Merge[A nub.Ord, B, C, D any](insertLeft func(A, B, D) D, insertBoth func(A
 
 				return tuple.Pair(tail, insertBoth(lKey, lValue, rVal, tuple.Second(acc)))
 
-			}, list.Head(xs), maybe.Just(list.Tail(xs))))
+			}, list.Head[tuple.Tuple[A, B]](xs), maybe.Just(list.Tail[tuple.Tuple[A, B]](xs))))
 	}
 
 	intermediate := FoldL(step, tuple.Pair(left.dict, result), right)
