@@ -93,19 +93,19 @@ func testListOfN(n int, t *testing.T) {
 
 	// IS EMPTY
 
-	if (n == 0) != IsEmpty(xs) {
+	if (n == 0) != IsEmpty[int](xs) {
 		t.Errorf("%d elements isEmpty", n)
 	}
 
 	// LENGHT
 
-	if n != Length(xs) {
+	if n != Length[int](xs) {
 		t.Errorf("%d elements length", n)
 	}
 
 	// REVERSE
 
-	if xsOpp != Reverse(xsNeg) {
+	if xsOpp != Reverse[int](xsNeg) {
 		t.Errorf("%d elements reverse", n)
 	}
 
@@ -124,11 +124,11 @@ func testListOfN(n int, t *testing.T) {
 	// HEAD
 
 	if n == 0 {
-		if maybe.Nothing[int]() != Head(xs) {
+		if maybe.Nothing[int]() != Head[int](xs) {
 			t.Errorf("head %d elements", n)
 		}
 	} else {
-		if maybe.Just(1) != Head(xs) {
+		if maybe.Just(1) != Head[int](xs) {
 			t.Errorf("head %d elements", n)
 		}
 	}
@@ -160,37 +160,37 @@ func testListOfN(n int, t *testing.T) {
 
 	// TAKE
 
-	if Nil[int]() != Take(0, xs) {
+	if Nil[int]() != Take[int](0, xs) {
 		t.Errorf("take %d elements none", n)
 	}
 
-	if Range(0, n-1) != Take(n, zs) {
+	if Range(0, n-1) != Take[int](n, zs) {
 		t.Errorf("take %d elements some", n)
 	}
 
-	if xs != Take(n, xs) {
+	if xs != Take[int](n, xs) {
 		t.Errorf("take %d elements all", n)
 	}
 
-	if xs != Take(n+1, xs) {
+	if xs != Take[int](n+1, xs) {
 		t.Errorf("take %d elements all+", n)
 	}
 
 	// DROP
 
-	if xs != Drop(0, xs) {
+	if xs != Drop[int](0, xs) {
 		t.Errorf("drop %d elements none", n)
 	}
 
-	if Singleton(n) != Drop(n, zs) {
+	if Singleton(n) != Drop[int](n, zs) {
 		t.Errorf("drop %d elements some", n)
 	}
 
-	if Nil[int]() != Drop(n, xs) {
+	if Nil[int]() != Drop[int](n, xs) {
 		t.Errorf("drop %d elements all", n)
 	}
 
-	if Nil[int]() != Drop(n+1, xs) {
+	if Nil[int]() != Drop[int](n+1, xs) {
 		t.Errorf("drop %d elements all+", n)
 	}
 
@@ -205,19 +205,19 @@ func testListOfN(n int, t *testing.T) {
 
 	// APPEND
 
-	if xsSum*2 != FoldL(sum, 0, Append(xs, xs)) {
+	if xsSum*2 != FoldL(sum, 0, Append[int](xs, xs)) {
 		t.Errorf("append %d elements", n)
 	}
 
 	// CONS
 
-	if Append(Singleton(-1), xs) != Cons(-1, xs) {
+	if Append[int](Singleton(-1), xs) != Cons(-1, xs) {
 		t.Errorf("cons %d elements", n)
 	}
 
 	// CONCAT
 
-	if Append(xs, Append(zs, xs)) != Concat(FromSlice([]List[int]{xs, zs, xs})) {
+	if Append[int](xs, Append[int](zs, xs)) != Concat[int](FromSlice([]List[int]{xs, zs, xs})) {
 		t.Errorf("concat %d elements", n)
 	}
 
@@ -303,7 +303,7 @@ func testListOfN(n int, t *testing.T) {
 		return tuple.Pair(-x, x)
 	}
 
-	if tuple.Pair(xsNeg, xs) != Unzip(Map(makePairs, xs)) {
+	if tuple.Pair(xsNeg, xs) != Unzip[int, int](Map(makePairs, xs)) {
 		t.Errorf("unzip %d elements", n)
 	}
 
@@ -346,18 +346,18 @@ func testListOfN(n int, t *testing.T) {
 
 	// SUM
 
-	if xsSum != Sum(xs) {
+	if xsSum != Sum[int](xs) {
 		t.Errorf("sum %d elements", n)
 	}
 
 	// MAXIMUM
 
 	if n == 0 {
-		if maybe.Nothing[int]() != Maximum(xs) {
+		if maybe.Nothing[int]() != Maximum[int](xs) {
 			t.Errorf("maximum %d elements", n)
 		}
 	} else {
-		if maybe.Just(n) != Maximum(xs) {
+		if maybe.Just(n) != Maximum[int](xs) {
 			t.Errorf("maximum %d elements", n)
 		}
 	}
@@ -365,18 +365,18 @@ func testListOfN(n int, t *testing.T) {
 	// MINIMUM
 
 	if n == 0 {
-		if maybe.Nothing[int]() != Minimum(xs) {
+		if maybe.Nothing[int]() != Minimum[int](xs) {
 			t.Errorf("minimum %d elements", n)
 		}
 	} else {
-		if maybe.Just(1) != Minimum(xs) {
+		if maybe.Just(1) != Minimum[int](xs) {
 			t.Errorf("minimum %d elements", n)
 		}
 	}
 
 	// PRODUCT
 
-	if Product(zs) != 0 {
+	if Product[int](zs) != 0 {
 		t.Errorf("product %d elements", n)
 	}
 
@@ -417,11 +417,11 @@ func testListOfN(n int, t *testing.T) {
 
 	// SORT
 
-	if xs != Sort(xs) {
+	if xs != Sort[int](xs) {
 		t.Errorf("sort %d elements sorted", n)
 	}
 
-	if xsOpp != Sort(xsNeg) {
+	if xsOpp != Sort[int](xsNeg) {
 		t.Errorf("sort %d elements unsorted", n)
 	}
 

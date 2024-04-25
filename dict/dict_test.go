@@ -11,11 +11,11 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	if FromList(list.Nil[tuple.Tuple[string, string]]()) != Empty[string, string]() {
+	if FromList[string, string](list.Nil[tuple.Tuple[string, string]]()) != Empty[string, string]() {
 		t.Error("Empty")
 	}
 
-	if FromList(list.Singleton(tuple.Pair("k", "v"))) != Singleton("k", "v") {
+	if FromList[string, string](list.Singleton(tuple.Pair("k", "v"))) != Singleton("k", "v") {
 		t.Error("Singleton")
 	}
 
@@ -56,7 +56,7 @@ func TestBuild(t *testing.T) {
 	}
 }
 
-var animals = FromList(list.Cons(tuple.Pair("Tom", "cat"), list.Singleton(tuple.Pair("Jerry", "mouse"))))
+var animals = FromList[string, string](list.Cons(tuple.Pair("Tom", "cat"), list.Singleton(tuple.Pair("Jerry", "mouse"))))
 
 func TestQuery(t *testing.T) {
 	if !Member("Tom", animals) {
@@ -103,8 +103,8 @@ func TestCombine(t *testing.T) {
 }
 
 func TestTransform(t *testing.T) {
-	if Map(func(x int) int { return x + 1 }, FromList(list.Cons(tuple.Pair("a", 1), list.Singleton(tuple.Pair("b", 2))))) !=
-		FromList(list.Cons(tuple.Pair("a", 2), list.Singleton(tuple.Pair("b", 3)))) {
+	if Map(func(x int) int { return x + 1 }, FromList[string, int](list.Cons(tuple.Pair("a", 1), list.Singleton(tuple.Pair("b", 2))))) !=
+		FromList[string, int](list.Cons(tuple.Pair("a", 2), list.Singleton(tuple.Pair("b", 3)))) {
 		t.Error("Map")
 	}
 
@@ -118,7 +118,7 @@ func TestTransform(t *testing.T) {
 }
 
 func insertBoth[T nub.Ord](key T, valueLeft list.List[int], valueRight list.List[int], dict Dict[T, list.List[int]]) Dict[T, list.List[int]] {
-	return Insert(key, list.Append(valueLeft, valueRight), dict)
+	return Insert(key, list.Append[int](valueLeft, valueRight), dict)
 }
 
 func TestMerge(t *testing.T) {
@@ -140,11 +140,11 @@ func TestMerge(t *testing.T) {
 
 	s23 := Insert("u2", list.Singleton(3), Empty[string, list.List[int]]())
 
-	b1 := FromList(list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
+	b1 := FromList[int, list.List[int]](list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
 		return tuple.Pair(x, list.Singleton(x))
 	}, list.Range(1, 10)))
 
-	b2 := FromList(list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
+	b2 := FromList[int, list.List[int]](list.Map(func(x int) tuple.Tuple[int, list.List[int]] {
 		return tuple.Pair(x, list.Singleton(x))
 	}, list.Range(5, 15)))
 

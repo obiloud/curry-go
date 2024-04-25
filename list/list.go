@@ -39,8 +39,8 @@ func (c consList[T]) String() string {
 		return util.Stringify(x)
 	}
 	strs := Map[T](toString, c)
-	slice := ToSlice(strs)
-	return fmt.Sprintf("[%s]", strings.Join(slice, ", "))
+	slice := ToSlice[string](strs)
+	return fmt.Sprintf("[%s]", strings.Join([]string(slice), ", "))
 }
 
 // CREATE
@@ -87,7 +87,7 @@ func repeatHelp[T any](result List[T], n int, value T) List[T] {
 
 func Length[T any](list List[T]) int {
 	if list.isCons() {
-		return 1 + Length(list.(consList[T]).tail)
+		return 1 + Length[T](list.(consList[T]).tail)
 	}
 	return 0
 }
@@ -172,7 +172,7 @@ func Map[A, B any](fn func(A) B, ls List[A]) List[B] {
 }
 
 func IndexedMap[A, B any](fn func(int, A) B, ls List[A]) List[B] {
-	return Map2(fn, Range(0, Length(ls)-1), ls)
+	return Map2(fn, Range(0, Length[A](ls)-1), ls)
 }
 
 func FoldL[A, B any](fn func(A, B) B, acc B, ls List[A]) B {
@@ -214,7 +214,7 @@ func foldRHelper[A, B any](fn func(A, B) B, acc B, ctr int, a List[A]) B {
 	e := d.(consList[A]).tail
 	var rest B
 	if ctr > 500 {
-		rest = FoldL(fn, acc, Reverse(e))
+		rest = FoldL(fn, acc, Reverse[A](e))
 	} else {
 		rest = foldRHelper(fn, acc, ctr+1, e)
 	}
@@ -255,7 +255,7 @@ func Concat[T any](lists List[List[T]]) List[T] {
 }
 
 func ConcatMap[A, B any](fn func(A) List[B], ls List[A]) List[B] {
-	return Concat(Map(fn, ls))
+	return Concat[B](Map(fn, ls))
 }
 
 func Intersperse[T any](sep T, xs List[T]) List[T] {
@@ -274,8 +274,8 @@ func Intersperse[T any](sep T, xs List[T]) List[T] {
 }
 
 func Map2[A, B, C any](fn func(A, B) C, xs List[A], ys List[B]) List[C] {
-	slice1 := ToSlice(xs)
-	slice2 := ToSlice(ys)
+	slice1 := ToSlice[A](xs)
+	slice2 := ToSlice[B](ys)
 	results := []C{}
 	for i := 0; i < len(slice1) && i < len(slice2); i++ {
 		a := slice1[i]
@@ -292,7 +292,7 @@ func Sort[T nub.Ord](ls List[T]) List[T] {
 }
 
 func SortBy[A any, B nub.Ord](fn func(A) B, ls List[A]) List[A] {
-	slice := ToSlice(ls)
+	slice := ToSlice[A](ls)
 
 	sortFn := func(x A, y A) nub.Order {
 		return nub.Compare(fn(x), fn(y))
@@ -304,7 +304,7 @@ func SortBy[A any, B nub.Ord](fn func(A) B, ls List[A]) List[A] {
 }
 
 func SortWith[T any](sortFn func(T, T) nub.Order, ls List[T]) List[T] {
-	slice := ToSlice(ls)
+	slice := ToSlice[T](ls)
 
 	quicksort(sortFn, slice)
 
@@ -346,7 +346,7 @@ func partition[T any](sortFn func(T, T) nub.Order, slice []T, lo int, hi int) in
 // DECONSTRUCT
 
 func IsEmpty[T any](list List[T]) bool {
-	return Length(list) == 0
+	return Length[T](list) == 0
 }
 
 func Head[T any](list List[T]) maybe.Maybe[T] {
@@ -372,7 +372,7 @@ func Take[T any](n int, ls List[T]) List[T] {
 			return ls
 		}
 
-		slice := ToSlice(ls)
+		slice := ToSlice[T](ls)
 
 		if n < len(slice) {
 			slice = slice[:n]
@@ -391,7 +391,7 @@ func Drop[T any](n int, ls List[T]) List[T] {
 			return ls
 		}
 
-		return Drop(n-1, ls.(consList[T]).tail)
+		return Drop[T](n-1, ls.(consList[T]).tail)
 	}
 }
 

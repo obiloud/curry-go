@@ -66,20 +66,20 @@ func Example_main() {
 
 	// Maybe is Appicative
 
-	log.Printf("Applicative identity %s == %s", maybe.Apply(maybe.Just(nub.Id[int]), justOne), justOne)
+	log.Printf("Applicative identity %s == %s", maybe.Apply[int, int](maybe.Just(nub.Id[int]), justOne), justOne)
 
 	log.Printf(
 		"Applicative Composition %s == %s",
-		maybe.Apply(
+		maybe.Apply[int, string](
 			maybe.Just(stringify),
-			maybe.Apply(
+			maybe.Apply[int, int](
 				maybe.Just(increment),
 				justOne,
 			),
 		),
-		maybe.Apply(
-			maybe.Apply(
-				maybe.Apply(
+		maybe.Apply[int, string](
+			maybe.Apply[int, string](
+				maybe.Apply[int, string](
 					maybe.Just(nub.Curry(nub.Compose[int, int, string])),
 					maybe.Just(stringify),
 				),
